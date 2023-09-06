@@ -35,29 +35,24 @@ function Question() {
   const navigate = useNavigate();
   const questionId: string = param.questionId || "0";
   const question: IQuestion = data.question[parseInt(questionId)];
-  let options: string[] = [
-    ...question.incorrect_answers,
-    question.correct_answer,
-  ];
   const [userChoice, setUserChoice] = useState("");
   const onClickHandler = (e: React.MouseEvent) => {
     const element = e.target as HTMLElement;
     setUserChoice(element.innerText);
-    if (userChoice === question.correct_answer) {
+    if (question.correct_answer == userChoice) {
       dispatch(setScore());
     }
     if (parseInt(questionId) < question.question.length) {
       navigate(`/question/${parseInt(questionId) + 1}`);
     }
   };
-
   const NextQuestion = () => {
     if (question.question.length - 1 > parseInt(questionId)) {
       navigate(`/question/${parseInt(questionId) + 1}`);
     }
   };
   const PrevQuestion = () => {
-    if (parseInt(questionId) >= 0) {
+    if (parseInt(questionId) > 0) {
       navigate(`/question/${parseInt(questionId) - 1}`);
     }
   };
@@ -65,7 +60,7 @@ function Question() {
   return (
     <>
       <Navbar />
-      {data.status && data.question.length > 0 ? (
+      {data.status ? (
         <Typography>{data.status}</Typography>
       ) : (
         <Box
@@ -82,7 +77,7 @@ function Question() {
               overflowY: "scroll",
             }}
           >
-            <QuestionNoList questionCount={data.question.length} />
+            <QuestionNoList questionCount={data?.question.length} />
           </Box>
           <Box
             sx={{
@@ -104,7 +99,7 @@ function Question() {
                 justifyContent: "space-between",
               }}
             >
-              <Typography variant="h4">{question.question}</Typography>
+              <Typography variant="h4">{question?.question}</Typography>
 
               <Box
                 sx={{
@@ -115,10 +110,16 @@ function Question() {
                   flexDirection: "column",
                 }}
               >
-                {options.length > 0 &&
-                  options.map((q) => (
+                {data.status ? (
+                  <Typography>{data.status}</Typography>
+                ) : (
+                  [
+                    ...question?.incorrect_answers,
+                    question?.correct_answer,
+                  ].map((q) => (
                     <Option optionText={q} onClick={onClickHandler} />
-                  ))}
+                  ))
+                )}
               </Box>
             </Box>
             <Box
@@ -132,7 +133,7 @@ function Question() {
                 Prev
               </Button>
               <Button variant="contained" onClick={NextQuestion}>
-                {parseInt(questionId) < question.question.length
+                {parseInt(questionId) < question?.question?.length
                   ? "Next"
                   : "Submit"}
               </Button>
